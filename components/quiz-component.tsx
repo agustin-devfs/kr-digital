@@ -286,6 +286,7 @@ export default function QuizComponent({ onComplete }: QuizComponentProps) {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((prev) => prev + 1)
     } else {
+      // Si es la última pregunta, iniciamos el proceso de envío directamente
       handleSubmit()
     }
   }
@@ -297,6 +298,9 @@ export default function QuizComponent({ onComplete }: QuizComponentProps) {
   }
 
   const handleSubmit = async () => {
+    // Evitar múltiples envíos
+    if (isSubmitting) return
+
     setIsSubmitting(true)
 
     // Simular un tiempo de carga de 4 segundos como se solicitó
@@ -305,7 +309,10 @@ export default function QuizComponent({ onComplete }: QuizComponentProps) {
     // Simular envío al webhook (la lógica real está en page.tsx)
     console.log("Quiz completado, respuestas:", answers)
 
-    setIsSubmitting(false)
+    // Importante: mantener isSubmitting en true para evitar que se vuelva a mostrar la pregunta
+    // No establecer isSubmitting a false aquí
+
+    // Llamar a onComplete para avanzar a la siguiente pantalla
     onComplete(answers)
   }
 
