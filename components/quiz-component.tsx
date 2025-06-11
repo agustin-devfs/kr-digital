@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { ChevronRight, ChevronLeft, Loader2 } from "lucide-react"
+import { ChevronRight, ChevronLeft, Loader2, RotateCcw } from "lucide-react"
 
 interface QuizComponentProps {
   onComplete: (answers: Record<string, string>) => void
+  savedAnswers?: Record<string, string>
+  onReset?: () => void
 }
 
 const questions = [
@@ -270,10 +272,25 @@ const questions = [
   },
 ]
 
-export default function QuizComponent({ onComplete }: QuizComponentProps) {
+export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }: QuizComponentProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [answers, setAnswers] = useState<Record<string, string>>(savedAnswers)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Cargar respuestas guardadas y determinar la pregunta actual
+  useEffect(() => {
+    if (Object.keys(savedAnswers).length > 0) {
+      setAnswers(savedAnswers)
+
+      // Encontrar la primera pregunta sin responder o ir a la última respondida
+      const answeredQuestions = Object.keys(savedAnswers).length
+      if (answeredQuestions < questions.length) {
+        setCurrentQuestion(answeredQuestions)
+      } else {
+        setCurrentQuestion(questions.length - 1)
+      }
+    }
+  }, [savedAnswers])
 
   const handleAnswer = (value: string) => {
     setAnswers((prev) => ({
@@ -330,6 +347,21 @@ export default function QuizComponent({ onComplete }: QuizComponentProps) {
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">TECH ASSESSMENT</h1>
           <p className="text-xl text-gray-400 font-medium">Descubre la solución perfecta para tu empresa</p>
+
+          {/* Botón de reset si hay respuestas guardadas */}
+          {Object.keys(savedAnswers).length > 0 && onReset && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-4">
+              <Button
+                onClick={onReset}
+                variant="outline"
+                size="sm"
+                className="bg-transparent border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Empezar de nuevo
+              </Button>
+            </motion.div>
+          )}
         </motion.div>
 
         {isSubmitting ? (

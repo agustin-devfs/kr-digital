@@ -2,22 +2,23 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { User, Mail, Phone, Send, Award, Sparkles, CheckCircle } from "lucide-react"
+import { User, Mail, Phone, Send, Award, Sparkles, CheckCircle, RotateCcw } from "lucide-react"
 
 interface ResultsAndFormProps {
   score: number
   reportHTML: string
   onSubmit: (data: any) => void
+  onReset?: () => void
 }
 
-export default function ResultsAndForm({ score, reportHTML, onSubmit }: ResultsAndFormProps) {
+export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }: ResultsAndFormProps) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -25,6 +26,28 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit }: ResultsA
     email: "",
     acceptTerms: false,
   })
+
+  // Cargar datos del formulario desde localStorage
+  useEffect(() => {
+    try {
+      const savedFormData = localStorage.getItem("quiz_form_data")
+      if (savedFormData) {
+        const parsedData = JSON.parse(savedFormData)
+        setFormData(parsedData)
+      }
+    } catch (error) {
+      console.error("Error al cargar datos del formulario:", error)
+    }
+  }, [])
+
+  // Guardar datos del formulario en localStorage cuando cambien
+  useEffect(() => {
+    try {
+      localStorage.setItem("quiz_form_data", JSON.stringify(formData))
+    } catch (error) {
+      console.error("Error al guardar datos del formulario:", error)
+    }
+  }, [formData])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,6 +80,21 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit }: ResultsA
           <p className="text-xl text-gray-400 font-medium">
             Revisa tus resultados y completa tus datos para recibir el reporte completo
           </p>
+
+          {/* Botón de reset */}
+          {onReset && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-4">
+              <Button
+                onClick={onReset}
+                variant="outline"
+                size="sm"
+                className="bg-transparent border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Empezar de nuevo
+              </Button>
+            </motion.div>
+          )}
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

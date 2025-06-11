@@ -1,12 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import QuizComponent from "@/components/quiz-component"
 import ResultsAndForm from "@/components/results-and-form"
 import ConfirmationDisplay from "@/components/confirmation-display"
 import CalendlyModal from "@/components/calendly-modal"
 import BackgroundEffects from "@/components/background-effects"
+
+// URL real del webhook
+const WEBHOOK_URL = "https://hook.us2.make.com/i3487uilk3skgcny1onpzhod8wenx159"
+const WEBHOOK_2_URL = "https://hook.us2.make.com/zcoxuxdkd6la3nga80duojy71dgrh5tt"
+
+// Claves para localStorage
+const STORAGE_KEYS = {
+  CURRENT_STEP: "quiz_current_step",
+  QUIZ_ANSWERS: "quiz_answers",
+  QUIZ_RESULTS: "quiz_results",
+  FORM_DATA: "quiz_form_data",
+}
 
 export default function HomePage() {
   const [currentStep, setCurrentStep] = useState<"quiz" | "results-form" | "confirmation">("quiz")
@@ -16,92 +28,175 @@ export default function HomePage() {
     reportHTML: string
   } | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Cargar datos del localStorage al inicializar
+  useEffect(() => {
+    const loadFromStorage = () => {
+      try {
+        // Cargar paso actual
+        const savedStep = localStorage.getItem(STORAGE_KEYS.CURRENT_STEP)
+        if (savedStep && ["quiz", "results-form", "confirmation"].includes(savedStep)) {
+          setCurrentStep(savedStep as "quiz" | "results-form" | "confirmation")
+        }
+
+        // Cargar respuestas del quiz
+        const savedAnswers = localStorage.getItem(STORAGE_KEYS.QUIZ_ANSWERS)
+        if (savedAnswers) {
+          setQuizAnswers(JSON.parse(savedAnswers))
+        }
+
+        // Cargar resultados del quiz
+        const savedResults = localStorage.getItem(STORAGE_KEYS.QUIZ_RESULTS)
+        if (savedResults) {
+          setQuizResults(JSON.parse(savedResults))
+        }
+      } catch (error) {
+        console.error("Error al cargar datos del localStorage:", error)
+        // En caso de error, limpiar localStorage y empezar de nuevo
+        clearStorage()
+      }
+      setIsLoading(false)
+    }
+
+    loadFromStorage()
+  }, [])
+
+  // Función para limpiar el localStorage
+  const clearStorage = () => {
+    Object.values(STORAGE_KEYS).forEach((key) => {
+      localStorage.removeItem(key)
+    })
+  }
+
+  // Función para guardar en localStorage
+  const saveToStorage = (key: string, data: any) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(data))
+    } catch (error) {
+      console.error("Error al guardar en localStorage:", error)
+    }
+  }
+
+  // Actualizar localStorage cuando cambie el paso
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_STEP, currentStep)
+    }
+  }, [currentStep, isLoading])
+
+  // Actualizar localStorage cuando cambien las respuestas
+  useEffect(() => {
+    if (!isLoading && Object.keys(quizAnswers).length > 0) {
+      saveToStorage(STORAGE_KEYS.QUIZ_ANSWERS, quizAnswers)
+    }
+  }, [quizAnswers, isLoading])
+
+  // Actualizar localStorage cuando cambien los resultados
+  useEffect(() => {
+    if (!isLoading && quizResults) {
+      saveToStorage(STORAGE_KEYS.QUIZ_RESULTS, quizResults)
+    }
+  }, [quizResults, isLoading])
 
   const handleQuizComplete = async (answers: Record<string, string>) => {
     // Guardar respuestas
     setQuizAnswers(answers)
 
     try {
-      // Mantener el código de fetch pero comentarlo para referencia
-      /*
-      const response = await fetch("https://hook.eu1.make.com/your-webhook-1-url", {
+      // Realizar la llamada real al webhook
+      console.log("Enviando respuestas al webhook:", answers)
+
+      const response = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ answers }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Error al procesar las respuestas");
+        throw new Error("Error al procesar las respuestas")
       }
 
-      const data = await response.json();
-      */
+      // Procesar la respuesta del webhook
+      const data = await response.json()
 
-      // Simular la respuesta del webhook después de un tiempo de espera
-      console.log("Enviando respuestas al webhook (simulado):", answers)
+      console.log("Respuesta del webhook:", data)
 
-      // Esperar 1 segundo para simular el tiempo de respuesta de la red
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Usar los datos reales de la respuesta
+      const results = {
+        score: data.score || calculateSimulatedScore(answers), // Usar simulación como fallback
+        reportHTML: data.reportHTML || generateSimulatedReport(answers, data.score || 0),
+      }
 
-      // Crear una respuesta simulada basada en las respuestas
-      const simulatedScore = calculateSimulatedScore(answers)
-      const simulatedReportHTML = generateSimulatedReport(answers, simulatedScore)
-
-      // Guardar score y reportHTML simulados
-      setQuizResults({
-        score: simulatedScore,
-        reportHTML: simulatedReportHTML,
-      })
+      setQuizResults(results)
 
       // Avanzar a la pantalla de resultados + formulario
       setCurrentStep("results-form")
     } catch (error) {
       console.error("Error al enviar respuestas:", error)
-      // En caso de error, avanzar de todos modos
+
+      // En caso de error, usar datos simulados como fallback
+      const simulatedScore = calculateSimulatedScore(answers)
+      const simulatedReportHTML = generateSimulatedReport(answers, simulatedScore)
+
+      const results = {
+        score: simulatedScore,
+        reportHTML: simulatedReportHTML,
+      }
+
+      setQuizResults(results)
+
+      // Avanzar a la pantalla de resultados + formulario de todos modos
       setCurrentStep("results-form")
     }
   }
 
   const handleFormSubmit = async (leadData: any) => {
+    // Guardar datos del formulario en localStorage
+    saveToStorage(STORAGE_KEYS.FORM_DATA, leadData)
+
     try {
-      // Mantener el código de fetch pero comentarlo para referencia
-      /*
-      const response = await fetch("https://hook.eu1.make.com/your-webhook-2-url", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            leadInfo: leadData,
-            score: quizResults?.score || 0,
-            reportHTML: quizResults?.reportHTML || "",
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Error al procesar el formulario");
-        }
-        */
-
-      // Simular el envío al webhook
-      console.log("Enviando datos al webhook (simulado):", {
+      // Enviar datos al webhook 2 real
+      console.log("Enviando datos al webhook 2:", {
         leadInfo: leadData,
         score: quizResults?.score || 0,
         reportHTML: quizResults?.reportHTML || "",
       })
 
-      // Esperar 1 segundo para simular el tiempo de respuesta de la red
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await fetch(WEBHOOK_2_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          leadInfo: leadData,
+          score: quizResults?.score || 0,
+          reportHTML: quizResults?.reportHTML || "",
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al procesar el formulario")
+      }
+
+      console.log("Respuesta del webhook 2:", await response.json())
 
       // Avanzar a la pantalla de confirmación
       setCurrentStep("confirmation")
     } catch (error) {
       console.error("Error al enviar formulario:", error)
-      // En caso de error, avanzar de todos modos
+      // En caso de error, avanzar de todos modos para no bloquear al usuario
       setCurrentStep("confirmation")
     }
+  }
+
+  const handleResetQuiz = () => {
+    clearStorage()
+    setCurrentStep("quiz")
+    setQuizAnswers({})
+    setQuizResults(null)
   }
 
   // Funciones auxiliares para generar respuestas simuladas
@@ -220,6 +315,25 @@ export default function HomePage() {
     return reportHTML
   }
 
+  // Mostrar loader mientras se cargan los datos del localStorage
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center">
+        <BackgroundEffects />
+        <div className="relative z-10">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            className="inline-block mb-6"
+          >
+            <div className="w-16 h-16 border-4 border-[#FF4D00] border-t-transparent rounded-full animate-spin" />
+          </motion.div>
+          <p className="text-xl text-gray-400 text-center">Cargando...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       <BackgroundEffects />
@@ -234,7 +348,7 @@ export default function HomePage() {
               exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
-              <QuizComponent onComplete={handleQuizComplete} />
+              <QuizComponent onComplete={handleQuizComplete} savedAnswers={quizAnswers} onReset={handleResetQuiz} />
             </motion.div>
           )}
 
@@ -250,6 +364,7 @@ export default function HomePage() {
                 score={quizResults?.score || 0}
                 reportHTML={quizResults?.reportHTML || ""}
                 onSubmit={handleFormSubmit}
+                onReset={handleResetQuiz}
               />
             </motion.div>
           )}
@@ -262,7 +377,7 @@ export default function HomePage() {
               exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
-              <ConfirmationDisplay onOpenModal={() => setIsModalOpen(true)} />
+              <ConfirmationDisplay onOpenModal={() => setIsModalOpen(true)} onReset={handleResetQuiz} />
             </motion.div>
           )}
         </AnimatePresence>

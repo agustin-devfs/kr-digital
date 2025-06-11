@@ -3,13 +3,14 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Calendar, CheckCircle, Mail, Clock } from "lucide-react"
+import { Calendar, CheckCircle, Mail, Clock, RotateCcw } from "lucide-react"
 
 interface ConfirmationDisplayProps {
   onOpenModal: () => void
+  onReset?: () => void
 }
 
-export default function ConfirmationDisplay({ onOpenModal }: ConfirmationDisplayProps) {
+export default function ConfirmationDisplay({ onOpenModal, onReset }: ConfirmationDisplayProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
@@ -30,6 +31,21 @@ export default function ConfirmationDisplay({ onOpenModal }: ConfirmationDisplay
           </motion.div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">¡PERFECTO!</h1>
           <p className="text-xl text-gray-400 font-medium">Tu análisis ha sido procesado exitosamente</p>
+
+          {/* Botón de reset */}
+          {onReset && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-4">
+              <Button
+                onClick={onReset}
+                variant="outline"
+                size="sm"
+                className="bg-transparent border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Realizar nuevo análisis
+              </Button>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Confirmation Card */}
