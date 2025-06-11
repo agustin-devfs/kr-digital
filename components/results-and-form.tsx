@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { User, Mail, Phone, Send, Award, Sparkles, CheckCircle, RotateCcw } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 interface ResultsAndFormProps {
   score: number
@@ -19,6 +20,7 @@ interface ResultsAndFormProps {
 }
 
 export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }: ResultsAndFormProps) {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -66,6 +68,13 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
   const isFormValid =
     formData.firstName && formData.lastName && formData.phone && formData.email && formData.acceptTerms
 
+  const getLevelText = () => {
+    if (score < 30) return t("results.level.initial")
+    if (score < 60) return t("results.level.developing")
+    if (score < 80) return t("results.level.advanced")
+    return t("results.level.exceptional")
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-6xl">
@@ -76,10 +85,8 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">TU ANÁLISIS</h1>
-          <p className="text-xl text-gray-400 font-medium">
-            Revisa tus resultados y completa tus datos para recibir el reporte completo
-          </p>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">{t("results.title")}</h1>
+          <p className="text-xl text-gray-400 font-medium">{t("results.subtitle")}</p>
 
           {/* Botón de reset */}
           {onReset && (
@@ -91,7 +98,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                 className="bg-transparent border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
-                Empezar de nuevo
+                {t("results.reset")}
               </Button>
             </motion.div>
           )}
@@ -122,17 +129,9 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                 <div className="text-center">
                   <h3 className="text-lg font-bold mb-2 flex items-center justify-center">
                     <Sparkles className="w-5 h-5 text-[#FF4D00] mr-2" />
-                    Tu Puntuación Tecnológica
+                    {t("results.score")}
                   </h3>
-                  <p className="text-sm text-gray-300">
-                    {score < 30
-                      ? "Etapas iniciales - Grandes oportunidades de mejora"
-                      : score < 60
-                        ? "Base sólida - Áreas clave por optimizar"
-                        : score < 80
-                          ? "Nivel avanzado - En el camino correcto"
-                          : "Nivel excepcional - ¡Felicidades!"}
-                  </p>
+                  <p className="text-sm text-gray-300">{getLevelText()}</p>
                 </div>
               </div>
 
@@ -140,13 +139,13 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
               <div className="max-h-96 overflow-y-auto">
                 <h3 className="text-lg font-bold mb-4 flex items-center">
                   <CheckCircle className="w-5 h-5 text-[#FF4D00] mr-2" />
-                  Análisis Detallado
+                  {t("results.analysis")}
                 </h3>
 
                 <div
                   className="prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed"
                   dangerouslySetInnerHTML={{
-                    __html: reportHTML || "<p>No se pudo generar el reporte. Por favor, intenta nuevamente.</p>",
+                    __html: reportHTML || `<p>${t("results.error")}</p>`,
                   }}
                 />
               </div>
@@ -161,8 +160,8 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
           >
             <Card className="bg-gray-900/50 border-gray-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm h-full">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">OBTÉN TU REPORTE COMPLETO</h2>
-                <p className="text-gray-400">Completa tus datos para recibir el análisis detallado por email</p>
+                <h2 className="text-2xl font-bold mb-2">{t("form.title")}</h2>
+                <p className="text-gray-400">{t("form.subtitle")}</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -174,7 +173,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                     transition={{ delay: 0.5 }}
                   >
                     <Label htmlFor="firstName" className="text-sm font-medium mb-2 block">
-                      Nombre *
+                      {t("form.firstName")} *
                     </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -184,7 +183,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                         value={formData.firstName}
                         onChange={(e) => handleInputChange("firstName", e.target.value)}
                         className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 h-10 rounded-lg focus:border-[#FF4D00] focus:ring-[#FF4D00]"
-                        placeholder="Tu nombre"
+                        placeholder={t("form.firstName")}
                         required
                       />
                     </div>
@@ -196,7 +195,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                     transition={{ delay: 0.6 }}
                   >
                     <Label htmlFor="lastName" className="text-sm font-medium mb-2 block">
-                      Apellido *
+                      {t("form.lastName")} *
                     </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -206,7 +205,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                         value={formData.lastName}
                         onChange={(e) => handleInputChange("lastName", e.target.value)}
                         className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 h-10 rounded-lg focus:border-[#FF4D00] focus:ring-[#FF4D00]"
-                        placeholder="Tu apellido"
+                        placeholder={t("form.lastName")}
                         required
                       />
                     </div>
@@ -216,7 +215,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                 {/* Contact Fields */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
                   <Label htmlFor="phone" className="text-sm font-medium mb-2 block">
-                    Teléfono *
+                    {t("form.phone")} *
                   </Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -234,7 +233,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
                   <Label htmlFor="email" className="text-sm font-medium mb-2 block">
-                    Email *
+                    {t("form.email")} *
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -264,8 +263,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                     className="mt-0.5 border-gray-600 data-[state=checked]:bg-[#FF4D00] data-[state=checked]:border-[#FF4D00]"
                   />
                   <Label htmlFor="terms" className="text-xs text-gray-300 leading-relaxed cursor-pointer">
-                    Acepto los <span className="text-[#FF4D00] hover:underline">Términos y Condiciones</span> y autorizo
-                    el tratamiento de mis datos personales para recibir información comercial.
+                    {t("form.terms")}
                   </Label>
                 </motion.div>
 
@@ -282,7 +280,7 @@ export default function ResultsAndForm({ score, reportHTML, onSubmit, onReset }:
                     className="w-full bg-white text-black hover:bg-gray-200 font-bold text-sm h-12 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                   >
                     <Send className="w-4 h-4 mr-2" />
-                    OBTENER REPORTE COMPLETO
+                    {t("form.submit")}
                   </Button>
                 </motion.div>
               </form>

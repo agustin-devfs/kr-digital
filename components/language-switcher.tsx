@@ -16,7 +16,7 @@ export default function LanguageSwitcher() {
       onClick={toggleLanguage}
       variant="outline"
       size="sm"
-      className="fixed top-4 right-4 z-50 bg-gray-900/50 border-gray-700 text-white hover:bg-gray-800 hover:text-white"
+      className="fixed top-4 right-4 z-50 bg-gray-900/50 border-gray-700 text-white hover:bg-gray-800 hover:text-white backdrop-blur-sm"
     >
       <Globe className="w-4 h-4 mr-2" />
       {t("language.switch")}

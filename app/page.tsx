@@ -7,6 +7,7 @@ import ResultsAndForm from "@/components/results-and-form"
 import ConfirmationDisplay from "@/components/confirmation-display"
 import CalendlyModal from "@/components/calendly-modal"
 import BackgroundEffects from "@/components/background-effects"
+import LanguageSwitcher from "@/components/language-switcher"
 
 // URL real del webhook
 const WEBHOOK_URL = "https://hook.us2.make.com/i3487uilk3skgcny1onpzhod8wenx159"
@@ -337,6 +338,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       <BackgroundEffects />
+      <LanguageSwitcher />
 
       <div className="relative z-10">
         <AnimatePresence mode="wait">

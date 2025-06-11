@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { ChevronRight, ChevronLeft, Loader2, RotateCcw } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 interface QuizComponentProps {
   onComplete: (answers: Record<string, string>) => void
@@ -17,262 +18,511 @@ interface QuizComponentProps {
 const questions = [
   {
     id: "q1",
-    question: "¿Cuál es el principal desafío de tu empresa actualmente?",
-    options: [
-      "Automatización de procesos",
-      "Transformación digital",
-      "Optimización de costos",
-      "Escalabilidad tecnológica",
-    ],
+    question: {
+      es: "¿Cuál es el principal desafío de tu empresa actualmente?",
+      en: "What is the main challenge of your company currently?",
+    },
+    options: {
+      es: [
+        "Automatización de procesos",
+        "Transformación digital",
+        "Optimización de costos",
+        "Escalabilidad tecnológica",
+      ],
+      en: ["Process automation", "Digital transformation", "Cost optimization", "Technological scalability"],
+    },
   },
   {
     id: "q2",
-    question: "¿Qué tamaño tiene tu organización?",
-    options: [
-      "Startup (1-10 empleados)",
-      "Pequeña empresa (11-50 empleados)",
-      "Mediana empresa (51-200 empleados)",
-      "Gran empresa (200+ empleados)",
-    ],
+    question: {
+      es: "¿Qué tamaño tiene tu organización?",
+      en: "What size is your organization?",
+    },
+    options: {
+      es: [
+        "Startup (1-10 empleados)",
+        "Pequeña empresa (11-50 empleados)",
+        "Mediana empresa (51-200 empleados)",
+        "Gran empresa (200+ empleados)",
+      ],
+      en: [
+        "Startup (1-10 employees)",
+        "Small business (11-50 employees)",
+        "Medium business (51-200 employees)",
+        "Large enterprise (200+ employees)",
+      ],
+    },
   },
   {
     id: "q3",
-    question: "¿Cuál es tu presupuesto aproximado para soluciones tecnológicas?",
-    options: ["Menos de $10,000", "$10,000 - $50,000", "$50,000 - $100,000", "Más de $100,000"],
+    question: {
+      es: "¿Cuál es tu presupuesto aproximado para soluciones tecnológicas?",
+      en: "What is your approximate budget for technology solutions?",
+    },
+    options: {
+      es: ["Menos de $10,000", "$10,000 - $50,000", "$50,000 - $100,000", "Más de $100,000"],
+      en: ["Less than $10,000", "$10,000 - $50,000", "$50,000 - $100,000", "More than $100,000"],
+    },
   },
   {
     id: "q4",
-    question: "¿Qué tecnologías utilizas actualmente?",
-    options: [
-      "Sistemas legacy principalmente",
-      "Mix de legacy y moderno",
-      "Tecnologías modernas",
-      "Cutting-edge tech stack",
-    ],
+    question: {
+      es: "¿Qué tecnologías utilizas actualmente?",
+      en: "What technologies are you currently using?",
+    },
+    options: {
+      es: [
+        "Sistemas legacy principalmente",
+        "Mix de legacy y moderno",
+        "Tecnologías modernas",
+        "Cutting-edge tech stack",
+      ],
+      en: ["Mainly legacy systems", "Mix of legacy and modern", "Modern technologies", "Cutting-edge tech stack"],
+    },
   },
   {
     id: "q5",
-    question: "¿Cuál es tu timeline para implementar una solución?",
-    options: [
-      "Inmediato (1-3 meses)",
-      "Corto plazo (3-6 meses)",
-      "Mediano plazo (6-12 meses)",
-      "Largo plazo (12+ meses)",
-    ],
+    question: {
+      es: "¿Cuál es tu timeline para implementar una solución?",
+      en: "What is your timeline for implementing a solution?",
+    },
+    options: {
+      es: ["Inmediato (1-3 meses)", "Corto plazo (3-6 meses)", "Mediano plazo (6-12 meses)", "Largo plazo (12+ meses)"],
+      en: ["Immediate (1-3 months)", "Short term (3-6 months)", "Medium term (6-12 months)", "Long term (12+ months)"],
+    },
   },
   {
     id: "q6",
-    question: "¿Qué área necesita más atención?",
-    options: ["Desarrollo de software", "Infraestructura y DevOps", "Análisis de datos", "Experiencia de usuario"],
+    question: {
+      es: "¿Qué área necesita más atención?",
+      en: "Which area needs more attention?",
+    },
+    options: {
+      es: ["Desarrollo de software", "Infraestructura y DevOps", "Análisis de datos", "Experiencia de usuario"],
+      en: ["Software development", "Infrastructure and DevOps", "Data analysis", "User experience"],
+    },
   },
   {
     id: "q7",
-    question: "¿Cómo mides el éxito de un proyecto tecnológico?",
-    options: [
-      "ROI y métricas financieras",
-      "Eficiencia operacional",
-      "Satisfacción del usuario",
-      "Innovación y diferenciación",
-    ],
+    question: {
+      es: "¿Cómo mides el éxito de un proyecto tecnológico?",
+      en: "How do you measure the success of a technology project?",
+    },
+    options: {
+      es: [
+        "ROI y métricas financieras",
+        "Eficiencia operacional",
+        "Satisfacción del usuario",
+        "Innovación y diferenciación",
+      ],
+      en: [
+        "ROI and financial metrics",
+        "Operational efficiency",
+        "User satisfaction",
+        "Innovation and differentiation",
+      ],
+    },
   },
   {
     id: "q8",
-    question: "¿Qué nivel de madurez digital tiene tu empresa?",
-    options: [
-      "Principiante - Apenas comenzando la transformación digital",
-      "Intermedio - Algunos procesos digitalizados",
-      "Avanzado - Mayoría de procesos digitalizados",
-      "Experto - Completamente digital y data-driven",
-    ],
+    question: {
+      es: "¿Qué nivel de madurez digital tiene tu empresa?",
+      en: "What level of digital maturity does your company have?",
+    },
+    options: {
+      es: [
+        "Principiante - Apenas comenzando la transformación digital",
+        "Intermedio - Algunos procesos digitalizados",
+        "Avanzado - Mayoría de procesos digitalizados",
+        "Experto - Completamente digital y data-driven",
+      ],
+      en: [
+        "Beginner - Just starting digital transformation",
+        "Intermediate - Some digitized processes",
+        "Advanced - Most processes digitized",
+        "Expert - Completely digital and data-driven",
+      ],
+    },
   },
   {
     id: "q9",
-    question: "¿Cuál es tu principal preocupación en ciberseguridad?",
-    options: [
-      "Protección de datos sensibles",
-      "Prevención de ataques externos",
-      "Cumplimiento normativo",
-      "Seguridad en la nube",
-    ],
+    question: {
+      es: "¿Cuál es tu principal preocupación en ciberseguridad?",
+      en: "What is your main cybersecurity concern?",
+    },
+    options: {
+      es: [
+        "Protección de datos sensibles",
+        "Prevención de ataques externos",
+        "Cumplimiento normativo",
+        "Seguridad en la nube",
+      ],
+      en: ["Protection of sensitive data", "Prevention of external attacks", "Regulatory compliance", "Cloud security"],
+    },
   },
   {
     id: "q10",
-    question: "¿Qué tan importante es la escalabilidad para tu negocio?",
-    options: [
-      "Crítica - Esperamos crecimiento exponencial",
-      "Muy importante - Crecimiento constante",
-      "Importante - Crecimiento moderado",
-      "Poco importante - Tamaño estable",
-    ],
+    question: {
+      es: "¿Qué tan importante es la escalabilidad para tu negocio?",
+      en: "How important is scalability for your business?",
+    },
+    options: {
+      es: [
+        "Crítica - Esperamos crecimiento exponencial",
+        "Muy importante - Crecimiento constante",
+        "Importante - Crecimiento moderado",
+        "Poco importante - Tamaño estable",
+      ],
+      en: [
+        "Critical - We expect exponential growth",
+        "Very important - Constant growth",
+        "Important - Moderate growth",
+        "Not very important - Stable size",
+      ],
+    },
   },
   {
     id: "q11",
-    question: "¿Qué enfoque prefieres para el desarrollo de software?",
-    options: ["Desarrollo interno con equipo propio", "Outsourcing completo", "Modelo híbrido", "No-code/Low-code"],
+    question: {
+      es: "¿Qué enfoque prefieres para el desarrollo de software?",
+      en: "What approach do you prefer for software development?",
+    },
+    options: {
+      es: ["Desarrollo interno con equipo propio", "Outsourcing completo", "Modelo híbrido", "No-code/Low-code"],
+      en: ["Internal development with own team", "Complete outsourcing", "Hybrid model", "No-code/Low-code"],
+    },
   },
   {
     id: "q12",
-    question: "¿Cuál es tu estrategia de datos actual?",
-    options: [
-      "No tenemos una estrategia definida",
-      "Recopilamos datos pero no los analizamos sistemáticamente",
-      "Análisis de datos básico para decisiones",
-      "Data-driven con analítica avanzada/IA",
-    ],
+    question: {
+      es: "¿Cuál es tu estrategia de datos actual?",
+      en: "What is your current data strategy?",
+    },
+    options: {
+      es: [
+        "No tenemos una estrategia definida",
+        "Recopilamos datos pero no los analizamos sistemáticamente",
+        "Análisis de datos básico para decisiones",
+        "Data-driven con analítica avanzada/IA",
+      ],
+      en: [
+        "We don't have a defined strategy",
+        "We collect data but don't analyze it systematically",
+        "Basic data analysis for decisions",
+        "Data-driven with advanced analytics/AI",
+      ],
+    },
   },
   {
     id: "q13",
-    question: "¿Qué tan importante es la experiencia de usuario (UX) para tu producto?",
-    options: [
-      "Crítica - Es nuestra ventaja competitiva",
-      "Muy importante - Invertimos significativamente en UX",
-      "Importante - Seguimos buenas prácticas",
-      "Secundaria - Priorizamos funcionalidad",
-    ],
+    question: {
+      es: "¿Qué tan importante es la experiencia de usuario (UX) para tu producto?",
+      en: "How important is user experience (UX) for your product?",
+    },
+    options: {
+      es: [
+        "Crítica - Es nuestra ventaja competitiva",
+        "Muy importante - Invertimos significativamente en UX",
+        "Importante - Seguimos buenas prácticas",
+        "Secundaria - Priorizamos funcionalidad",
+      ],
+      en: [
+        "Critical - It's our competitive advantage",
+        "Very important - We invest significantly in UX",
+        "Important - We follow best practices",
+        "Secondary - We prioritize functionality",
+      ],
+    },
   },
   {
     id: "q14",
-    question: "¿Qué enfoque tienes hacia la innovación tecnológica?",
-    options: [
-      "Early adopter - Siempre buscamos lo último",
-      "Seguidor temprano - Adoptamos tecnología probada pero reciente",
-      "Mayoría - Esperamos que la tecnología madure",
-      "Conservador - Solo tecnologías establecidas",
-    ],
+    question: {
+      es: "¿Qué enfoque tienes hacia la innovación tecnológica?",
+      en: "What approach do you have towards technological innovation?",
+    },
+    options: {
+      es: [
+        "Early adopter - Siempre buscamos lo último",
+        "Seguidor temprano - Adoptamos tecnología probada pero reciente",
+        "Mayoría - Esperamos que la tecnología madure",
+        "Conservador - Solo tecnologías establecidas",
+      ],
+      en: [
+        "Early adopter - Always looking for the latest",
+        "Early follower - We adopt proven but recent technology",
+        "Majority - We wait for technology to mature",
+        "Conservative - Only established technologies",
+      ],
+    },
   },
   {
     id: "q15",
-    question: "¿Cuál es tu principal desafío en la gestión de proyectos tecnológicos?",
-    options: [
-      "Cumplir plazos y presupuestos",
-      "Gestionar cambios de alcance",
-      "Comunicación entre equipos técnicos y no técnicos",
-      "Asegurar calidad y testing",
-    ],
+    question: {
+      es: "¿Cuál es tu principal desafío en la gestión de proyectos tecnológicos?",
+      en: "What is your main challenge in managing technology projects?",
+    },
+    options: {
+      es: [
+        "Cumplir plazos y presupuestos",
+        "Gestionar cambios de alcance",
+        "Comunicación entre equipos técnicos y no técnicos",
+        "Asegurar calidad y testing",
+      ],
+      en: [
+        "Meeting deadlines and budgets",
+        "Managing scope changes",
+        "Communication between technical and non-technical teams",
+        "Ensuring quality and testing",
+      ],
+    },
   },
   {
     id: "q16",
-    question: "¿Qué tan importante es la movilidad en tu estrategia digital?",
-    options: [
-      "Crítica - Mobile-first en todo",
-      "Muy importante - Aplicaciones móviles son clave",
-      "Importante - Necesitamos responsive design",
-      "Secundaria - Principalmente desktop",
-    ],
+    question: {
+      es: "¿Qué tan importante es la movilidad en tu estrategia digital?",
+      en: "How important is mobility in your digital strategy?",
+    },
+    options: {
+      es: [
+        "Crítica - Mobile-first en todo",
+        "Muy importante - Aplicaciones móviles son clave",
+        "Importante - Necesitamos responsive design",
+        "Secundaria - Principalmente desktop",
+      ],
+      en: [
+        "Critical - Mobile-first in everything",
+        "Very important - Mobile apps are key",
+        "Important - We need responsive design",
+        "Secondary - Mainly desktop",
+      ],
+    },
   },
   {
     id: "q17",
-    question: "¿Qué enfoque tienes hacia la arquitectura de sistemas?",
-    options: [
-      "Monolítica - Sistema único integrado",
-      "Microservicios - Componentes independientes",
-      "Híbrida - Combinación según necesidades",
-      "Serverless - Enfoque en funciones",
-    ],
+    question: {
+      es: "¿Qué enfoque tienes hacia la arquitectura de sistemas?",
+      en: "What approach do you have towards system architecture?",
+    },
+    options: {
+      es: [
+        "Monolítica - Sistema único integrado",
+        "Microservicios - Componentes independientes",
+        "Híbrida - Combinación según necesidades",
+        "Serverless - Enfoque en funciones",
+      ],
+      en: [
+        "Monolithic - Single integrated system",
+        "Microservices - Independent components",
+        "Hybrid - Combination according to needs",
+        "Serverless - Focus on functions",
+      ],
+    },
   },
   {
     id: "q18",
-    question: "¿Cuál es tu estrategia de nube?",
-    options: ["Todo en la nube pública", "Nube privada", "Híbrida (pública y privada)", "On-premise principalmente"],
+    question: {
+      es: "¿Cuál es tu estrategia de nube?",
+      en: "What is your cloud strategy?",
+    },
+    options: {
+      es: ["Todo en la nube pública", "Nube privada", "Híbrida (pública y privada)", "On-premise principalmente"],
+      en: ["Everything in the public cloud", "Private cloud", "Hybrid (public and private)", "Mainly on-premise"],
+    },
   },
   {
     id: "q19",
-    question: "¿Qué tan importante es la automatización para tu negocio?",
-    options: [
-      "Crítica - Buscamos automatizar todo lo posible",
-      "Muy importante - Automatizamos procesos clave",
-      "Importante - Automatizamos selectivamente",
-      "Limitada - Preferimos control manual",
-    ],
+    question: {
+      es: "¿Qué tan importante es la automatización para tu negocio?",
+      en: "How important is automation for your business?",
+    },
+    options: {
+      es: [
+        "Crítica - Buscamos automatizar todo lo posible",
+        "Muy importante - Automatizamos procesos clave",
+        "Importante - Automatizamos selectivamente",
+        "Limitada - Preferimos control manual",
+      ],
+      en: [
+        "Critical - We seek to automate everything possible",
+        "Very important - We automate key processes",
+        "Important - We automate selectively",
+        "Limited - We prefer manual control",
+      ],
+    },
   },
   {
     id: "q20",
-    question: "¿Cuál es tu enfoque hacia la integración de sistemas?",
-    options: [
-      "Ecosistema único de un proveedor",
-      "Best-of-breed con integraciones",
-      "Desarrollo personalizado con APIs",
-      "Sistemas independientes",
-    ],
+    question: {
+      es: "¿Cuál es tu enfoque hacia la integración de sistemas?",
+      en: "What is your approach to system integration?",
+    },
+    options: {
+      es: [
+        "Ecosistema único de un proveedor",
+        "Best-of-breed con integraciones",
+        "Desarrollo personalizado con APIs",
+        "Sistemas independientes",
+      ],
+      en: [
+        "Single vendor ecosystem",
+        "Best-of-breed with integrations",
+        "Custom development with APIs",
+        "Independent systems",
+      ],
+    },
   },
   {
     id: "q21",
-    question: "¿Qué tan importante es el time-to-market para tu negocio?",
-    options: [
-      "Crítico - Velocidad ante todo",
-      "Muy importante - Balanceamos velocidad y calidad",
-      "Importante - Preferimos calidad sobre velocidad",
-      "Secundario - Nos enfocamos en perfección",
-    ],
+    question: {
+      es: "¿Qué tan importante es el time-to-market para tu negocio?",
+      en: "How important is time-to-market for your business?",
+    },
+    options: {
+      es: [
+        "Crítico - Velocidad ante todo",
+        "Muy importante - Balanceamos velocidad y calidad",
+        "Importante - Preferimos calidad sobre velocidad",
+        "Secundario - Nos enfocamos en perfección",
+      ],
+      en: [
+        "Critical - Speed above all",
+        "Very important - We balance speed and quality",
+        "Important - We prefer quality over speed",
+        "Secondary - We focus on perfection",
+      ],
+    },
   },
   {
     id: "q22",
-    question: "¿Cuál es tu enfoque hacia el testing y QA?",
-    options: [
-      "Testing continuo automatizado",
-      "Testing manual exhaustivo",
-      "Testing básico de funcionalidades clave",
-      "Testing mínimo",
-    ],
+    question: {
+      es: "¿Cuál es tu enfoque hacia el testing y QA?",
+      en: "What is your approach to testing and QA?",
+    },
+    options: {
+      es: ["Testing continuo automatizado", "Testing manual exhaustivo", "Testing básico de funcionalidades clave"],
+      en: ["Continuous automated testing", "Exhaustive manual testing", "Basic testing of key functionalities"],
+    },
   },
   {
     id: "q23",
-    question: "¿Qué metodología de desarrollo prefieres?",
-    options: ["Agile/Scrum", "Kanban", "Waterfall", "Híbrido según proyecto"],
+    question: {
+      es: "¿Qué metodología de desarrollo prefieres?",
+      en: "What development methodology do you prefer?",
+    },
+    options: {
+      es: ["Agile/Scrum", "Kanban", "Waterfall", "Híbrido según proyecto"],
+      en: ["Agile/Scrum", "Kanban", "Waterfall", "Hybrid according to project"],
+    },
   },
   {
     id: "q24",
-    question: "¿Cuál es tu estrategia de backup y recuperación?",
-    options: [
-      "Backups automáticos con recuperación inmediata",
-      "Backups regulares con plan de recuperación",
-      "Backups ocasionales",
-      "No tenemos estrategia formal",
-    ],
+    question: {
+      es: "¿Cuál es tu estrategia de backup y recuperación?",
+      en: "What is your backup and recovery strategy?",
+    },
+    options: {
+      es: [
+        "Backups automáticos con recuperación inmediata",
+        "Backups regulares con plan de recuperación",
+        "Backups ocasionales",
+        "No tenemos estrategia formal",
+      ],
+      en: [
+        "Automatic backups with immediate recovery",
+        "Regular backups with recovery plan",
+        "Occasional backups",
+        "We don't have a formal strategy",
+      ],
+    },
   },
   {
     id: "q25",
-    question: "¿Qué tan importante es la accesibilidad en tus productos digitales?",
-    options: [
-      "Crítica - Cumplimos estándares WCAG AAA",
-      "Muy importante - Cumplimos WCAG AA",
-      "Importante - Consideraciones básicas",
-      "No es prioridad actualmente",
-    ],
+    question: {
+      es: "¿Qué tan importante es la accesibilidad en tus productos digitales?",
+      en: "How important is accessibility in your digital products?",
+    },
+    options: {
+      es: [
+        "Crítica - Cumplimos estándares WCAG AAA",
+        "Muy importante - Cumplimos WCAG AA",
+        "Importante - Consideraciones básicas",
+        "No es prioridad actualmente",
+      ],
+      en: [
+        "Critical - We comply with WCAG AAA standards",
+        "Very important - We comply with WCAG AA",
+        "Important - Basic considerations",
+        "Not a priority currently",
+      ],
+    },
   },
   {
     id: "q26",
-    question: "¿Cuál es tu enfoque hacia la documentación técnica?",
-    options: [
-      "Documentación exhaustiva y actualizada",
-      "Documentación de componentes clave",
-      "Documentación básica",
-      "Mínima o inexistente",
-    ],
+    question: {
+      es: "¿Cuál es tu enfoque hacia la documentación técnica?",
+      en: "What is your approach to technical documentation?",
+    },
+    options: {
+      es: [
+        "Documentación exhaustiva y actualizada",
+        "Documentación de componentes clave",
+        "Documentación básica",
+        "Mínima o inexistente",
+      ],
+      en: [
+        "Comprehensive and updated documentation",
+        "Documentation of key components",
+        "Basic documentation",
+        "Minimal or non-existent",
+      ],
+    },
   },
   {
     id: "q27",
-    question: "¿Qué tan importante es la sostenibilidad en tu estrategia tecnológica?",
-    options: [
-      "Crítica - Optimizamos para eficiencia energética",
-      "Importante - Consideramos el impacto ambiental",
-      "En desarrollo - Comenzando a implementar prácticas",
-      "No es prioridad actualmente",
-    ],
+    question: {
+      es: "¿Qué tan importante es la sostenibilidad en tu estrategia tecnológica?",
+      en: "How important is sustainability in your technology strategy?",
+    },
+    options: {
+      es: [
+        "Crítica - Optimizamos para eficiencia energética",
+        "Importante - Consideramos el impacto ambiental",
+        "En desarrollo - Comenzando a implementar prácticas",
+        "No es prioridad actualmente",
+      ],
+      en: [
+        "Critical - We optimize for energy efficiency",
+        "Important - We consider environmental impact",
+        "In development - Starting to implement practices",
+        "Not a priority currently",
+      ],
+    },
   },
   {
     id: "q28",
-    question: "¿Cuál es tu visión tecnológica a largo plazo?",
-    options: [
-      "Liderazgo innovador en el sector",
-      "Adopción estratégica de tecnologías probadas",
-      "Optimización continua de sistemas existentes",
-      "Estabilidad y confiabilidad ante todo",
-    ],
+    question: {
+      es: "¿Cuál es tu visión tecnológica a largo plazo?",
+      en: "What is your long-term technology vision?",
+    },
+    options: {
+      es: [
+        "Liderazgo innovador en el sector",
+        "Adopción estratégica de tecnologías probadas",
+        "Optimización continua de sistemas existentes",
+        "Estabilidad y confiabilidad ante todo",
+      ],
+      en: [
+        "Innovative leadership in the sector",
+        "Strategic adoption of proven technologies",
+        "Continuous optimization of existing systems",
+        "Stability and reliability above all",
+      ],
+    },
   },
 ]
 
 export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }: QuizComponentProps) {
+  const { t, language } = useLanguage()
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>(savedAnswers)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -345,8 +595,8 @@ export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">TECH ASSESSMENT</h1>
-          <p className="text-xl text-gray-400 font-medium">Descubre la solución perfecta para tu empresa</p>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">{t("quiz.title")}</h1>
+          <p className="text-xl text-gray-400 font-medium">{t("quiz.subtitle")}</p>
 
           {/* Botón de reset si hay respuestas guardadas */}
           {Object.keys(savedAnswers).length > 0 && onReset && (
@@ -358,7 +608,7 @@ export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }
                 className="bg-transparent border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
-                Empezar de nuevo
+                {t("quiz.reset")}
               </Button>
             </motion.div>
           )}
@@ -373,8 +623,8 @@ export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }
             >
               <Loader2 className="w-16 h-16 text-[#FF4D00]" />
             </motion.div>
-            <h3 className="text-2xl font-bold mb-4">Procesando tus respuestas...</h3>
-            <p className="text-gray-400 text-lg">Estamos analizando tu perfil tecnológico</p>
+            <h3 className="text-2xl font-bold mb-4">{t("quiz.processing")}</h3>
+            <p className="text-gray-400 text-lg">{t("quiz.analyzing")}</p>
             <motion.div
               className="mt-8 flex justify-center space-x-2"
               initial={{ opacity: 0 }}
@@ -404,7 +654,7 @@ export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }
             <motion.div className="mb-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
               <div className="flex justify-between text-sm text-gray-400 mb-2">
                 <span>
-                  Pregunta {currentQuestion + 1} de {questions.length}
+                  {t("quiz.question")} {currentQuestion + 1} {t("quiz.of")} {questions.length}
                 </span>
                 <span>{Math.round(progress)}%</span>
               </div>
@@ -428,7 +678,7 @@ export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }
             >
               <Card className="bg-gray-900/50 border-gray-800 rounded-2xl p-8 shadow-xl backdrop-blur-sm">
                 <h2 className="text-2xl md:text-3xl font-bold mb-8 leading-tight">
-                  {questions[currentQuestion].question}
+                  {questions[currentQuestion].question[language]}
                 </h2>
 
                 <RadioGroup
@@ -436,7 +686,7 @@ export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }
                   onValueChange={handleAnswer}
                   className="space-y-4"
                 >
-                  {questions[currentQuestion].options.map((option, index) => (
+                  {questions[currentQuestion].options[language].map((option, index) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, y: 20 }}
@@ -473,7 +723,7 @@ export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }
                 className="bg-transparent border-gray-700 text-white hover:bg-gray-800 disabled:opacity-30"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
-                Anterior
+                {t("quiz.previous")}
               </Button>
 
               <Button
@@ -481,7 +731,7 @@ export default function QuizComponent({ onComplete, savedAnswers = {}, onReset }
                 disabled={!answers[questions[currentQuestion].id]}
                 className="bg-white text-black hover:bg-gray-200 font-bold px-8 disabled:opacity-50"
               >
-                {currentQuestion === questions.length - 1 ? "Ver mi resultado" : "Siguiente"}
+                {currentQuestion === questions.length - 1 ? t("quiz.seeResult") : t("quiz.next")}
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </motion.div>

@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Calendar, CheckCircle, Mail, Clock, RotateCcw } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 interface ConfirmationDisplayProps {
   onOpenModal: () => void
@@ -11,6 +12,8 @@ interface ConfirmationDisplayProps {
 }
 
 export default function ConfirmationDisplay({ onOpenModal, onReset }: ConfirmationDisplayProps) {
+  const { t } = useLanguage()
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
@@ -29,8 +32,8 @@ export default function ConfirmationDisplay({ onOpenModal, onReset }: Confirmati
           >
             <CheckCircle className="w-20 h-20 text-[#FF4D00] mx-auto" />
           </motion.div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">¡PERFECTO!</h1>
-          <p className="text-xl text-gray-400 font-medium">Tu análisis ha sido procesado exitosamente</p>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">{t("confirmation.title")}</h1>
+          <p className="text-xl text-gray-400 font-medium">{t("confirmation.subtitle")}</p>
 
           {/* Botón de reset */}
           {onReset && (
@@ -42,7 +45,7 @@ export default function ConfirmationDisplay({ onOpenModal, onReset }: Confirmati
                 className="bg-transparent border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
-                Realizar nuevo análisis
+                {t("confirmation.reset")}
               </Button>
             </motion.div>
           )}
@@ -56,11 +59,8 @@ export default function ConfirmationDisplay({ onOpenModal, onReset }: Confirmati
         >
           <Card className="bg-gray-900/50 border-gray-800 rounded-2xl p-8 shadow-xl backdrop-blur-sm">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4">Análisis Completado</h2>
-              <p className="text-lg text-gray-300 leading-relaxed">
-                Hemos procesado tu evaluación tecnológica y enviado el reporte detallado a tu email. Nuestro equipo de
-                expertos revisará tu perfil y te contactará con recomendaciones personalizadas.
-              </p>
+              <h2 className="text-3xl font-bold mb-4">{t("confirmation.completed")}</h2>
+              <p className="text-lg text-gray-300 leading-relaxed">{t("confirmation.message")}</p>
             </div>
 
             {/* Status Items */}
@@ -73,8 +73,8 @@ export default function ConfirmationDisplay({ onOpenModal, onReset }: Confirmati
               >
                 <CheckCircle className="w-6 h-6 text-green-500 mr-4 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold">Análisis Procesado</h3>
-                  <p className="text-sm text-gray-400">Tu evaluación tecnológica ha sido completada</p>
+                  <h3 className="font-semibold">{t("confirmation.processed")}</h3>
+                  <p className="text-sm text-gray-400">{t("confirmation.processed.desc")}</p>
                 </div>
               </motion.div>
 
@@ -86,8 +86,8 @@ export default function ConfirmationDisplay({ onOpenModal, onReset }: Confirmati
               >
                 <Mail className="w-6 h-6 text-[#FF4D00] mr-4 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold">Reporte Enviado</h3>
-                  <p className="text-sm text-gray-400">Revisa tu email para el análisis detallado</p>
+                  <h3 className="font-semibold">{t("confirmation.sent")}</h3>
+                  <p className="text-sm text-gray-400">{t("confirmation.sent.desc")}</p>
                 </div>
               </motion.div>
 
@@ -99,8 +99,8 @@ export default function ConfirmationDisplay({ onOpenModal, onReset }: Confirmati
               >
                 <Clock className="w-6 h-6 text-blue-500 mr-4 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold">Próximos Pasos</h3>
-                  <p className="text-sm text-gray-400">Nuestro equipo te contactará en las próximas 24 horas</p>
+                  <h3 className="font-semibold">{t("confirmation.next")}</h3>
+                  <p className="text-sm text-gray-400">{t("confirmation.next.desc")}</p>
                 </div>
               </motion.div>
             </div>
@@ -113,11 +113,8 @@ export default function ConfirmationDisplay({ onOpenModal, onReset }: Confirmati
               className="border-t border-gray-700 pt-8"
             >
               <div className="bg-gradient-to-r from-[#FF4D00]/10 to-[#FF6F3C]/10 rounded-xl p-6 border border-[#FF4D00]/20">
-                <h3 className="text-xl font-bold mb-3 text-center">¿Quieres acelerar el proceso?</h3>
-                <p className="text-gray-300 mb-6 text-center">
-                  Agenda una consulta estratégica gratuita con nuestros expertos para discutir tu roadmap tecnológico
-                  inmediatamente.
-                </p>
+                <h3 className="text-xl font-bold mb-3 text-center">{t("confirmation.cta.title")}</h3>
+                <p className="text-gray-300 mb-6 text-center">{t("confirmation.cta.desc")}</p>
 
                 <div className="text-center">
                   <Button
@@ -125,13 +122,11 @@ export default function ConfirmationDisplay({ onOpenModal, onReset }: Confirmati
                     className="bg-gradient-to-r from-[#FF4D00] to-[#FF6F3C] hover:from-[#FF6F3C] hover:to-[#FF4D00] text-white font-bold text-lg px-8 py-3 rounded-xl transition-all duration-300 transform hover:scale-105"
                   >
                     <Calendar className="w-5 h-5 mr-3" />
-                    AGENDAR CONSULTA GRATUITA
+                    {t("confirmation.cta.button")}
                   </Button>
                 </div>
 
-                <p className="text-xs text-gray-500 text-center mt-4">
-                  Consulta de 30 minutos • Sin compromiso • Análisis personalizado
-                </p>
+                <p className="text-xs text-gray-500 text-center mt-4">{t("confirmation.cta.footer")}</p>
               </div>
             </motion.div>
           </Card>
